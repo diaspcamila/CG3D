@@ -1,0 +1,39 @@
+<html>
+
+    <head>
+        <title>UECE 3D</title>
+    </head>
+
+    <script src="./app.js"></script>
+
+    <script id="vertex-shader" type="notjs">
+        attribute vec4 position;
+        attribute vec4 color;
+
+        varying vec4 v_color;
+
+        void main()
+        {
+            v_color = color;
+            gl_Position = position;
+        }
+    </script>
+
+    <script id="frag-shader" type="notjs">
+        precision mediump float;
+
+        varying vec4 v_color;
+
+        void main()
+        {
+            gl_FragColor = v_color;
+        }
+    </script>
+
+    <body onload="init()">
+
+        <canvas id="glcanvas1" width="800" height="600"></canvas>
+
+    </body>
+
+</html>
