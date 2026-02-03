@@ -1,7 +1,7 @@
 <html>
 
     <head>
-        <title>UECE 3D</title>
+        <title>Passeio do Ceará 3D</title>
     </head>
 
     <script src="./app.js"></script>
@@ -12,8 +12,20 @@
 
         varying vec4 v_color;
 
+        attribute vec3 normal;
+        varying vec3 v_normal;
+
+        uniform vec3 lightpos;
+        varying vec3 pointToLight;
+
+        uniform vec3 campos;
+        varying vec3 pointToCam;
+
         void main()
         {
+            pointToLight = lightpos - position.xyz;
+            pointToCam = campos - position.xyz;
+            
             v_color = color;
             gl_Position = position;
         }
@@ -24,8 +36,33 @@
 
         varying vec4 v_color;
 
+        varying vec3 v_normal;
+        uniform vec3 lightDirection;
+        uniform vec3 lightColor;
+
+        varying vec3 pointToLight;
+        varying vec3 pointToCam;
+
         void main()
         {
+            vec3 pToLight = normalize(pointToLight);
+            vec3 pToCam = normalize(pointToCam);
+
+            vec3 halfVec = normalize(pToCam + pToLight);
+
+            vec3 v_normal_n = normalize(v_normal);
+            vec3 lightDirection_n = normalize(-lightDirection);
+
+            float lightd = dot(v_normal_n, lightDirection_n);
+            float lightp = dot(v_normal_n, pToLight);
+            float lighte = dot(v_normal_n, halfVec);
+
+            if(lightd < 0.0) lightd = 0.0;
+            if(lightp < 0.0) lightp = 0.0;
+            if(lighte < 0.0) lighte = 0.0;
+
+            
+
             gl_FragColor = v_color;
         }
     </script>
