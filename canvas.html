@@ -7,12 +7,23 @@
         <script src="./math.js"></script>
         <script src="./transforms.js"></script>
         <script src="./objetos.js"></script>
+        <script src="gl-matrix-min.js"></script>
 
         <!--executando o programa principal e shaders-->
         <script src="./webgl.js"></script>
         <script id="vertex-shader" type="notjs">
             attribute vec4 position;
             attribute vec2 texCoord;
+
+            attribute vec3 normal;
+            varying vec3 v_normal;
+
+            uniform vec3 lightpos;
+            varying vec3 pointToLight;
+
+            uniform vec3 campos;
+            varying vec3 pointToCam;
+
             uniform mat4 transf;
             uniform float df;
 
@@ -20,6 +31,9 @@
 
             void main()
             {
+                pointToLight = lightpos - position.xyz
+                pointToCam = campos - position.xyz;
+
                 v_texCoord = texCoord;
                 gl_Position = transf*position;
 
@@ -29,12 +43,36 @@
         <script id="frag-shader" type="notjs">
             precision mediump float;
 
+            varying vec3 v_normal;
+        
+            uniform vec3 lightDirection;
+            uniform vec3 lightColor;
+
+            varying vec3 pointToLight;
+            varying vec3 pointToCam;
+
             uniform sampler2D tex;
 
             varying vec2 v_texCoord;
 
             void main()
             {
+                vec3 pToLight = normalize(pointToLight);
+                vec3 pToCam = normalize(pointToCam);
+
+                vec3 halfVec = normalize(pToCam + pToLight);
+
+                vec3 v_normal_n = normalize(v_normal);
+                vec3 lightDirection_n = normalize(-lightDirection);
+
+                float lightd = dot(v_normal_n, lightDirection_n);
+                float lightp = dot(v_normal_n, pToLight);
+                float lighte = dot(v_normal_n, halfVec);
+
+                if(lightd < 0.0) lightd = 0.0;
+                if(lightp < 0.0) lightp = 0.0;
+                if(lighte < 0.0) lighte = 0.0;
+
                 gl_FragColor = texture2D(tex, v_texCoord);
             }
         </script>
