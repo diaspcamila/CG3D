@@ -42,9 +42,9 @@ var objetos = [];
 
 //objeto exemplo 1: cubo de gatos
 //ordem das texturas: face +x, face +z, face +y, face -x, face -z, face -y
-objetos.push(paralelepipedo(0, 0.3, 0, 0.3, 0.3, 0.3, ["gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg"]));
-
-
+objetos.push(paralelepipedo(0, -1, 0, 1, 1, 0.1,["gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg"]));
+objetos.push(paralelepipedo(1, -0.5, 1, 0.1, 0.1, 0.5,["gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg"]));
+objetos.push(paralelepipedo(-1, -0.5, -1, 0.1, 0.1, 0.5,["gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg","gato.jpg"]));
 
 //ajustes:
 var coords = [];
