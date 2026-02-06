@@ -3,7 +3,9 @@ var texSrc = ["gato.jpg", "cachorro.png"]; //LISTAR TODAS AS TEXTURAS AQUI -leti
 var loadTexs = 0;
 var gl;
 var prog;
-var df = 2.0;
+
+var u_modelPtr, u_viewPtr, u_projectionPtr;
+var lightposPtr, camposPtr;
 
 var angle = 0;
 
@@ -59,6 +61,12 @@ function init()
             loadTexs++;
             loadTextures();
         }
+
+        teximg[i].onerror = function() {
+            console.error("Erro ao carregar imagem: " + this.src);
+            loadTexs++;
+            loadTextures();
+        }
     }
 }
 
@@ -91,7 +99,7 @@ function initGL()
 
         //Inicializa área de desenho: viewport e cor de limpeza; limpa a tela
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor(0, 0, 0, 1);
+        gl.clearColor(0.5, 0.5, 0.5, 1);
         gl.enable( gl.BLEND );
         gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
         gl.enable(gl.DEPTH_TEST);
@@ -137,6 +145,17 @@ function configScene()
         3*4       //salto inicial (em bytes)
     );
 
+    var normalsCoords = [];
+    for(let i=0; i<objetos.length; i++) {
+        normalsCoords.push(...objetos[i].list_norm);
+    }
+    var normBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalsCoords), gl.STATIC_DRAW);
+
+    var normalPtr = gl.getAttribLocation(prog, "normal");
+    gl.enableVertexAttribArray(normalPtr);
+    gl.vertexAttribPointer(normalPtr, 3, gl.FLOAT, false, 0, 0);
     //submeter textura para gpu
     //(infelizmente acho q isso aqui tem q simplesmente repetir pra cada textura nova -leticia)
     var tex0 = gl.createTexture();
@@ -157,27 +176,54 @@ function configScene()
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[1]);
 
-    dfPtr = gl.getUniformLocation(prog, "df");
-    gl.uniform1f(dfPtr, df);
+    u_modelPtr = gl.getUniformLocation(prog, "u_model");
+    u_viewPtr = gl.getUniformLocation(prog, "u_view");
+    u_projectionPtr = gl.getUniformLocation(prog, "u_projection");
+    
+    lightposPtr = gl.getUniformLocation(prog, "lightpos");
+    camposPtr = gl.getUniformLocation(prog, "campos");
+}
+
+function sendMathJSMatrix(gl, location, matrix) {
+    // transpoe matriz, webgl le as matrizes coluna por coluna
+    var transposed = math.transpose(matrix);
+    var flatArray = transposed.toArray().flat(); 
+    gl.uniformMatrix4fv(location, false, new Float32Array(flatArray));
 }
 
 function draw()
 {
-    transfPtr = gl.getUniformLocation(prog, "transf");
-    gl.uniformMatrix4fv(transfPtr, false, matrotY(angle)); //aqui a função q faz tudo girar (parece ser obrigatória?) -leticia
-
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+    
+    var camPos = [0,2,5];
+    var camTarget = [0,0,0];
+    var camUp = [0,1,0];
+    var lightPos = [5.0, 5.0, 5.0];
+
+    gl.uniform3fv(lightposPtr, lightPos);
+    gl.uniform3fv(camposPtr, camPos);
+
+    var viewMatrix = lookAt(camPos, camTarget, camUp);
+    sendMathJSMatrix(gl, u_viewPtr, viewMatrix);
+
+    var aspect = gl.canvas.width / gl.canvas.height;
+    var projMatrix = createPerspective(45, aspect, 0.1, 100.0);
+    sendMathJSMatrix(gl, u_projectionPtr, projMatrix);
+
+    var modelMatrix = matrotY(angle); 
+    gl.uniformMatrix4fv(u_modelPtr, false, new Float32Array(modelMatrix));
 
     //desenha triângulos - executa shaders
     var texPtr = gl.getUniformLocation(prog, "tex");
     for (i = 0; i < objetos.length; i++){ //iterando entre cada objeto
         for (j = 0; j < objetos[i].indexes_triang.length; j++){ //iterando entre cada triangulo
             let tex_code = texSrc.indexOf(objetos[i].list_tex[j]);
+            if(tex_code == -1) tex_code = 0; 
+
             gl.uniform1i(texPtr, tex_code);
             gl.drawArrays(gl.TRIANGLES, objetos[i].indexes_triang[j], 3);
-        }
+        }   
     }
-
     angle++;
 
     requestAnimationFrame(draw);
