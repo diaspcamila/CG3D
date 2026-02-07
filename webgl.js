@@ -1,5 +1,5 @@
 var teximg = [];
-var texSrc = ["gato.jpg", "cachorro.png"]; //LISTAR TODAS AS TEXTURAS AQUI -leticia
+var texSrc = ["gato.jpg", "cachorro.png", "chao.jpg", "parede.jpg", "lousa.jpg", "cinza.jpg", "madeira.jpg"]; //LISTAR TODAS AS TEXTURAS AQUI -leticia
 var loadTexs = 0;
 var gl;
 var prog;
@@ -176,6 +176,51 @@ function configScene()
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[1]);
 
+    var tex2 = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, tex2);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[2]);
+
+    var tex3 = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE3);
+    gl.bindTexture(gl.TEXTURE_2D, tex3);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[3]);
+
+    var tex4 = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE4);
+    gl.bindTexture(gl.TEXTURE_2D, tex4);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[4]);
+
+    var tex5 = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE5);
+    gl.bindTexture(gl.TEXTURE_2D, tex5);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[5]);
+
+    var tex6 = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE6);
+    gl.bindTexture(gl.TEXTURE_2D, tex6);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[6]);
+
     u_modelPtr = gl.getUniformLocation(prog, "u_model");
     u_viewPtr = gl.getUniformLocation(prog, "u_view");
     u_projectionPtr = gl.getUniformLocation(prog, "u_projection");
@@ -195,8 +240,8 @@ function draw()
 {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
     
-    var camPos = [0,2,5];
-    var camTarget = [0,0,0];
+    var camPos = [0, 0, 3];
+    var camTarget = [0, 0, 0];
     var camUp = [0,1,0];
     var lightPos = [5.0, 5.0, 5.0];
 
@@ -210,8 +255,8 @@ function draw()
     var projMatrix = createPerspective(45, aspect, 0.1, 100.0);
     sendMathJSMatrix(gl, u_projectionPtr, projMatrix);
 
-    var modelMatrix = matrotY(angle); 
-    gl.uniformMatrix4fv(u_modelPtr, false, new Float32Array(modelMatrix));
+    var modelMatrix = math.identity(4);
+    sendMathJSMatrix(gl, u_modelPtr, modelMatrix);
 
     //desenha triângulos - executa shaders
     var texPtr = gl.getUniformLocation(prog, "tex");
@@ -224,7 +269,7 @@ function draw()
             gl.drawArrays(gl.TRIANGLES, objetos[i].indexes_triang[j], 3);
         }   
     }
-    angle++;
+    //angle++;
 
     requestAnimationFrame(draw);
 }
