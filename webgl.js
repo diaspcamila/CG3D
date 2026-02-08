@@ -8,7 +8,7 @@ var u_modelPtr, u_viewPtr, u_projectionPtr;
 var lightposPtr, camposPtr;
 
 // ====== CÂMERA (VISÃO DE CACHORRO) ======
-var camPos = [0, -0.8, 3];   // >>> ALTERAÇÃO <<<
+var camPos = [0, -1.3, 3];   // >>> ALTERAÇÃO <<<
 var yaw = -90;             // >>> ALTERAÇÃO <<<
 var pitch = 0;             // >>> ALTERAÇÃO <<<
 
@@ -16,6 +16,8 @@ var speed = 0.08;
 var turnSpeed = 2;
 
 var keys = {};
+
+var Latido = null;
 
 document.addEventListener("keydown", function(e) {
     keys[e.key.toLowerCase()] = true;
@@ -112,6 +114,8 @@ function initGL()
     var canvas = document.getElementById("glcanvas1");
     gl = getGL(canvas);
 
+    audioLatido();
+
     var vtxShSrc = document.getElementById("vertex-shader").text;
     var fragShSrc = document.getElementById("frag-shader").text;
 
@@ -206,6 +210,7 @@ function draw()
     if (keys["arrowright"]) yaw += turnSpeed;
     if (keys["arrowup"])    pitch += turnSpeed;
     if (keys["arrowdown"])  pitch -= turnSpeed;
+    
 
     // limita pra não virar de cabeça pra baixo
     pitch = Math.max(-89, Math.min(89, pitch));
@@ -253,4 +258,17 @@ function draw()
     }
 
     requestAnimationFrame(draw);
+}
+
+function audioLatido(){
+    latido = new Audio('latido.mp3');
+    latido.preload = "auto";
+
+    const btn = document.getElementById('btnLatido');
+    if(!btn) return;
+
+    btn.addEventListener('click', () => {
+        latido.currentTime = 0;
+        latido.play().catch(function () {});
+    });
 }
