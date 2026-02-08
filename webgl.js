@@ -1,5 +1,5 @@
 var teximg = [];
-var texSrc = ["gato.jpg", "cachorro.png", "chao.jpg", "parede.jpg", "lousa.jpg", "cinza.jpg", "madeira.jpg"]; //LISTAR TODAS AS TEXTURAS AQUI -leticia
+var texSrc = ["gato.jpg", "cachorro.png", "chao.jpg", "parede.jpg", "lousa.jpg", "cinza.jpg", "madeira.jpg", "coluna.jpg", "janela.jpg", "arcondicionado.jpg", "jan-porta.jpg", "jan-cima.jpg", "projetor.jpg", "preto.jpg", "mesa.jpg"]
 var loadTexs = 0;
 var gl;
 var prog;
@@ -7,7 +7,23 @@ var prog;
 var u_modelPtr, u_viewPtr, u_projectionPtr;
 var lightposPtr, camposPtr;
 
-var angle = 0;
+// ====== CÂMERA (VISÃO DE CACHORRO) ======
+var camPos = [0, -0.8, 3];   // >>> ALTERAÇÃO <<<
+var yaw = -90;             // >>> ALTERAÇÃO <<<
+var pitch = 0;             // >>> ALTERAÇÃO <<<
+
+var speed = 0.08;
+var turnSpeed = 2;
+
+var keys = {};
+
+document.addEventListener("keydown", function(e) {
+    keys[e.key.toLowerCase()] = true;
+});
+
+document.addEventListener("keyup", function(e) {
+    keys[e.key.toLowerCase()] = false;
+});
 
 function getGL(canvas)
 {
@@ -31,7 +47,6 @@ function createShader(gl, shaderType, shaderSrc)
         return shader;
 
     alert("Erro de compilação: " + gl.getShaderInfoLog(shader));
-
     gl.deleteShader(shader);
 }
 
@@ -46,9 +61,21 @@ function createProgram(gl, vtxShader, fragShader)
         return prog;
 
     alert("Erro de linkagem: " + gl.getProgramInfoLog(prog));
-
     gl.deleteProgram(prog);
 }
+
+// ====== TECLADO (SETAS) ======
+document.addEventListener("keydown", function(e) {   // >>> ALTERAÇÃO <<<
+    const step = 3;
+
+    if (e.key === "ArrowLeft")  yaw -= step;
+    if (e.key === "ArrowRight") yaw += step;
+
+    if (e.key === "ArrowUp")    pitch += step;
+    if (e.key === "ArrowDown")  pitch -= step;
+
+    pitch = Math.max(-89, Math.min(89, pitch));
+});
 
 function init()
 {
@@ -83,72 +110,41 @@ function loadTextures()
 function initGL()
 {
     var canvas = document.getElementById("glcanvas1");
-
     gl = getGL(canvas);
-    if(gl)
-    {
-        //Inicializa shaders
-        var vtxShSrc = document.getElementById("vertex-shader").text;
-        var fragShSrc = document.getElementById("frag-shader").text;
 
-        var vtxShader = createShader(gl, gl.VERTEX_SHADER, vtxShSrc);
-        var fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragShSrc);
-        prog = createProgram(gl, vtxShader, fragShader);
+    var vtxShSrc = document.getElementById("vertex-shader").text;
+    var fragShSrc = document.getElementById("frag-shader").text;
 
-        gl.useProgram(prog);
+    var vtxShader = createShader(gl, gl.VERTEX_SHADER, vtxShSrc);
+    var fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragShSrc);
+    prog = createProgram(gl, vtxShader, fragShader);
 
-        //Inicializa área de desenho: viewport e cor de limpeza; limpa a tela
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor(0.5, 0.5, 0.5, 1);
-        gl.enable( gl.BLEND );
-        gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-        gl.enable(gl.DEPTH_TEST);
-        //gl.enable(gl.CULL_FACE);
+    gl.useProgram(prog);
 
-    }
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0.5, 0.5, 0.5, 1);
+    gl.enable(gl.DEPTH_TEST);
 }
 
 function configScene()
 {
-    //Cria buffer na GPU e copia coordenadas para ele
     var bufPtr = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, bufPtr);
     gl.bufferData(gl.ARRAY_BUFFER, coordTriangles, gl.STATIC_DRAW);
 
-    //Pega ponteiro para o atributo "position" do vertex shader
     var positionPtr = gl.getAttribLocation(prog, "position");
     gl.enableVertexAttribArray(positionPtr);
-
-    //Especifica a cópia dos valores do buffer para o atributo
-    gl.vertexAttribPointer(
-        positionPtr,
-        3,        //quantidade de dados em cada processamento
-        gl.FLOAT, //tipo de cada dado (tamanho)
-        false,    //não normalizar
-        5*4,      //tamanho do bloco de dados a processar em cada passo
-                    //0 indica que o tamanho do bloco é igual a tamanho
-                    //lido (2 floats, ou seja, 2*4 bytes = 8 bytes)
-        0         //salto inicial (em bytes)
-    );
+    gl.vertexAttribPointer(positionPtr, 3, gl.FLOAT, false, 5*4, 0);
 
     var texcoordPtr = gl.getAttribLocation(prog, "texCoord");
     gl.enableVertexAttribArray(texcoordPtr);
-
-    //Especifica a cópia dos valores do buffer para o atributo
-    gl.vertexAttribPointer(texcoordPtr,
-        2,        //quantidade de dados em cada processamento
-        gl.FLOAT, //tipo de cada dado (tamanho)
-        false,    //não normalizar
-        5*4,      //tamanho do bloco de dados a processar em cada passo
-                    //0 indica que o tamanho do bloco é igual a tamanho
-                    //lido (2 floats, ou seja, 2*4 bytes = 8 bytes)
-        3*4       //salto inicial (em bytes)
-    );
+    gl.vertexAttribPointer(texcoordPtr, 2, gl.FLOAT, false, 5*4, 3*4);
 
     var normalsCoords = [];
     for(let i=0; i<objetos.length; i++) {
         normalsCoords.push(...objetos[i].list_norm);
     }
+
     var normBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, normBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalsCoords), gl.STATIC_DRAW);
@@ -156,81 +152,26 @@ function configScene()
     var normalPtr = gl.getAttribLocation(prog, "normal");
     gl.enableVertexAttribArray(normalPtr);
     gl.vertexAttribPointer(normalPtr, 3, gl.FLOAT, false, 0, 0);
-    //submeter textura para gpu
-    //(infelizmente acho q isso aqui tem q simplesmente repetir pra cada textura nova -leticia)
-    var tex0 = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, tex0);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[0]);
 
-    var tex1 = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, tex1);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[1]);
-
-    var tex2 = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, tex2);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[2]);
-
-    var tex3 = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE3);
-    gl.bindTexture(gl.TEXTURE_2D, tex3);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[3]);
-
-    var tex4 = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE4);
-    gl.bindTexture(gl.TEXTURE_2D, tex4);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[4]);
-
-    var tex5 = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE5);
-    gl.bindTexture(gl.TEXTURE_2D, tex5);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[5]);
-
-    var tex6 = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE6);
-    gl.bindTexture(gl.TEXTURE_2D, tex6);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[6]);
+    for(let i=0; i<teximg.length; i++) {
+        let tex = gl.createTexture();
+        gl.activeTexture(gl.TEXTURE0 + i);
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, teximg[i]);
+    }
 
     u_modelPtr = gl.getUniformLocation(prog, "u_model");
     u_viewPtr = gl.getUniformLocation(prog, "u_view");
     u_projectionPtr = gl.getUniformLocation(prog, "u_projection");
-    
     lightposPtr = gl.getUniformLocation(prog, "lightpos");
     camposPtr = gl.getUniformLocation(prog, "campos");
 }
 
 function sendMathJSMatrix(gl, location, matrix) {
-    // transpoe matriz, webgl le as matrizes coluna por coluna
     var transposed = math.transpose(matrix);
     var flatArray = transposed.toArray().flat(); 
     gl.uniformMatrix4fv(location, false, new Float32Array(flatArray));
@@ -238,12 +179,55 @@ function sendMathJSMatrix(gl, location, matrix) {
 
 function draw()
 {
-    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
-    
-    var camPos = [0, 0, 3];
-    var camTarget = [0, 0, 0];
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        // ===== MOVIMENTO =====
+    var rad = yaw * Math.PI / 180;
+
+    if (keys["w"]) {
+        camPos[0] += Math.cos(rad) * speed;
+        camPos[2] += Math.sin(rad) * speed;
+    }
+    if (keys["s"]) {
+        camPos[0] -= Math.cos(rad) * speed;
+        camPos[2] -= Math.sin(rad) * speed;
+    }
+    if (keys["a"]) {
+        camPos[0] += Math.sin(rad) * speed;
+        camPos[2] -= Math.cos(rad) * speed;
+    }
+    if (keys["d"]) {
+        camPos[0] -= Math.sin(rad) * speed;
+        camPos[2] += Math.cos(rad) * speed;
+    }
+
+    // ===== ROTACAO =====
+    if (keys["arrowleft"])  yaw -= turnSpeed;
+    if (keys["arrowright"]) yaw += turnSpeed;
+    if (keys["arrowup"])    pitch += turnSpeed;
+    if (keys["arrowdown"])  pitch -= turnSpeed;
+
+    // limita pra não virar de cabeça pra baixo
+    pitch = Math.max(-89, Math.min(89, pitch));
+
+    // ====== DIREÇÃO DA CÂMERA ======
+    var radYaw = yaw * Math.PI / 180;
+    var radPitch = pitch * Math.PI / 180;
+
+    var camDir = [
+        Math.cos(radPitch) * Math.cos(radYaw),
+        Math.sin(radPitch),
+        Math.cos(radPitch) * Math.sin(radYaw)
+    ];
+
+    var camTarget = [
+        camPos[0] + camDir[0],
+        camPos[1] + camDir[1],
+        camPos[2] + camDir[2]
+    ];
+
     var camUp = [0,1,0];
-    var lightPos = [5.0, 5.0, 5.0];
+    var lightPos = [5,5,5];
 
     gl.uniform3fv(lightposPtr, lightPos);
     gl.uniform3fv(camposPtr, camPos);
@@ -252,24 +236,21 @@ function draw()
     sendMathJSMatrix(gl, u_viewPtr, viewMatrix);
 
     var aspect = gl.canvas.width / gl.canvas.height;
-    var projMatrix = createPerspective(45, aspect, 0.1, 100.0);
+    var projMatrix = createPerspective(45, aspect, 0.1, 100);
     sendMathJSMatrix(gl, u_projectionPtr, projMatrix);
 
-    var modelMatrix = math.identity(4);
-    sendMathJSMatrix(gl, u_modelPtr, modelMatrix);
+    sendMathJSMatrix(gl, u_modelPtr, math.identity(4));
 
-    //desenha triângulos - executa shaders
     var texPtr = gl.getUniformLocation(prog, "tex");
-    for (i = 0; i < objetos.length; i++){ //iterando entre cada objeto
-        for (j = 0; j < objetos[i].indexes_triang.length; j++){ //iterando entre cada triangulo
-            let tex_code = texSrc.indexOf(objetos[i].list_tex[j]);
-            if(tex_code == -1) tex_code = 0; 
 
+    for (let i = 0; i < objetos.length; i++){
+        for (let j = 0; j < objetos[i].indexes_triang.length; j++){
+            let tex_code = texSrc.indexOf(objetos[i].list_tex[j]);
+            if(tex_code < 0) tex_code = 0;
             gl.uniform1i(texPtr, tex_code);
             gl.drawArrays(gl.TRIANGLES, objetos[i].indexes_triang[j], 3);
-        }   
+        }
     }
-    //angle++;
 
     requestAnimationFrame(draw);
 }
