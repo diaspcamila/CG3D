@@ -394,6 +394,17 @@ objetos.push(
     )
 );
 
+let paArIndex = objetos.length;
+
+objetos.push(
+    paralelepipedo(
+        4.42, 1.32, -2.6,   // posição (na frente do ar)
+        0.01, 0.6, 0.08,   // fino e comprido
+        Array(12).fill("cinza.jpg")
+    )
+);
+
+
 //janelas
 [-1, -4, 1, 4.1].forEach(z => {
     objetos.push(paralelepipedo(4.9, 0.2, z, 0.01, 0.8, 1, Array(12).fill("janela.jpg")));

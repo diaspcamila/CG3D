@@ -6,28 +6,35 @@ var mId = [[1, 0, 0],
 
 
 function matrotZ(angle){
-    return [Math.cos(angle*Math.PI/180.0), -Math.sin(angle*Math.PI/180.0), 0.0, 0.0,
-    Math.sin(angle*Math.PI/180.0),  Math.cos(angle*Math.PI/180.0), 0.0, 0.0,
-    0.0,    0.0,   1.0, 0.0,
-    0.0,    0.0,   0.0, 1.0];
+    return math.matrix([
+        [math.cos(angle*Math.PI/180), -math.sin(angle*Math.PI/180), 0, 0],
+        [math.sin(angle*Math.PI/180),  math.cos(angle*Math.PI/180), 0, 0],
+        [0,0,1,0],
+        [0,0,0,1]
+    ]);
 }
 
 function matrotY(angle){
-    return [Math.cos(angle*Math.PI/180.0), 0.0, -Math.sin(angle*Math.PI/180.0), 0.0,
-    0.0, 1.0, 0.0, 0.0,
-    Math.sin(angle*Math.PI/180.0),  0.0, Math.cos(angle*Math.PI/180.0), 0.0,
-    0.0,    0.0,   0.0, 1.0];
+    return math.matrix([
+        [ math.cos(angle*Math.PI/180),0,math.sin(angle*Math.PI/180),0],
+        [0,1,0,0],
+        [-math.sin(angle*Math.PI/180),0,math.cos(angle*Math.PI/180),0],
+        [0,0,0,1]
+    ]);
 }
 
 function matrotX(angle){
-    return [ 1.0, 0.0, 0.0, 0.0,
-    0.0, Math.cos(angle*Math.PI/180.0), -Math.sin(angle*Math.PI/180.0), 0.0,
-    0.0, Math.sin(angle*Math.PI/180.0),  Math.cos(angle*Math.PI/180.0), 0.0,
-    0.0,    0.0,   0.0 ,1.0];
+    return math.matrix([
+        [1,0,0,0],
+        [0,math.cos(angle*Math.PI/180),-math.sin(angle*Math.PI/180),0],
+        [0,math.sin(angle*Math.PI/180), math.cos(angle*Math.PI/180),0],
+        [0,0,0,1]
+    ]);
 }
 
+
 function mattrans(tx, ty, tz){
-    return Math.matrix([
+    return math.matrix([
         [1, 0, 0, tx],
         [0, 1, 0, ty],
         [0, 0, 1, tz],
@@ -36,7 +43,7 @@ function mattrans(tx, ty, tz){
 }
 
 function matescala(sx, sy, sz){
-    return Math.matrix([
+    return math.matrix([
         [sx, 0, 0, 0],
         [0, sy, 0, 0],
         [0, 0, sz, 0],
@@ -45,9 +52,9 @@ function matescala(sx, sy, sz){
 }
 
 function normalMat(modelMatrix){
-    const inv = Math.inv(modelMatrix);
+    const inv = math.inv(modelMatrix);
 
-    const trans = Math.transpose(inv);
+    const trans = math.transpose(inv);
 
     return trans;
 }

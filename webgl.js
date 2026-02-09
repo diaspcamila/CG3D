@@ -25,6 +25,8 @@ var limitesSala = {
 
 var keys = {};
 
+var tempo = 0;
+
 var Latido = null;
 
 document.addEventListener("keydown", function(e) {
@@ -184,16 +186,36 @@ function configScene()
 }
 
 function sendMathJSMatrix(gl, location, matrix) {
-    var transposed = math.transpose(matrix);
-    var flatArray = transposed.toArray().flat(); 
-    gl.uniformMatrix4fv(location, false, new Float32Array(flatArray));
+
+    const flat = math.transpose(matrix).toArray().flat();
+
+    gl.uniformMatrix4fv(
+        location,
+        false,
+        new Float32Array(flat)
+    );
 }
 
-function draw()
-{
+
+var tempo = 0;
+var lastTime = 0;
+
+function draw(time){
+
+    // ===== DELTA TIME (animação suave) =====
+    if(!time) time = 0;
+
+    let delta = (time - lastTime) * 0.001;
+    lastTime = time;
+
+    tempo += delta * 2; // velocidade da animação
+
+
+    // ===== LIMPA TELA =====
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        // ===== MOVIMENTO =====
+
+    // ===== MOVIMENTO DA CÂMERA =====
     var rad = yaw * Math.PI / 180;
 
     if (keys["w"]) {
@@ -240,17 +262,17 @@ function draw()
             camPos[2] = novoZ;
     }
 
-    // ===== ROTACAO =====
+
+    // ===== ROTAÇÃO =====
     if (keys["arrowleft"])  yaw -= turnSpeed;
     if (keys["arrowright"]) yaw += turnSpeed;
     if (keys["arrowup"])    pitch += turnSpeed;
     if (keys["arrowdown"])  pitch -= turnSpeed;
-    
 
-    // limita pra não virar de cabeça pra baixo
     pitch = Math.max(-89, Math.min(89, pitch));
 
-    // ====== DIREÇÃO DA CÂMERA ======
+
+    // ===== DIREÇÃO DA CÂMERA =====
     var radYaw = yaw * Math.PI / 180;
     var radPitch = pitch * Math.PI / 180;
 
@@ -272,6 +294,8 @@ function draw()
     gl.uniform3fv(lightposPtr, lightPos);
     gl.uniform3fv(camposPtr, camPos);
 
+
+    // ===== MATRIZES VIEW E PROJECTION =====
     var viewMatrix = lookAt(camPos, camTarget, camUp);
     sendMathJSMatrix(gl, u_viewPtr, viewMatrix);
 
@@ -279,21 +303,55 @@ function draw()
     var projMatrix = createPerspective(45, aspect, 0.1, 100);
     sendMathJSMatrix(gl, u_projectionPtr, projMatrix);
 
-    sendMathJSMatrix(gl, u_modelPtr, math.identity(4));
 
+    // ===== DESENHO DOS OBJETOS =====
     var texPtr = gl.getUniformLocation(prog, "tex");
 
     for (let i = 0; i < objetos.length; i++){
+
+        // identidade REAL
+        let model = math.identity(4);
+
+
+        if(i === paArIndex){
+
+            let angle = Math.sin(tempo) * 10;
+
+            let px = 4.4;
+            let py = 1.35;
+            let pz = 0;
+
+            let T1 = mattrans(-px, -py, -pz); // leva pivô pra origem
+            let R  = matrotZ(angle);
+            let T2 = mattrans(px, py, pz);    // volta
+
+            model = math.multiply(T2,
+                    math.multiply(R, T1));
+        }
+
+
+
+        sendMathJSMatrix(gl, u_modelPtr, model);
+
+
         for (let j = 0; j < objetos[i].indexes_triang.length; j++){
+
             let tex_code = texSrc.indexOf(objetos[i].list_tex[j]);
             if(tex_code < 0) tex_code = 0;
+
             gl.uniform1i(texPtr, tex_code);
-            gl.drawArrays(gl.TRIANGLES, objetos[i].indexes_triang[j], 3);
+
+            gl.drawArrays(
+                gl.TRIANGLES,
+                objetos[i].indexes_triang[j],
+                3
+            );
         }
     }
 
     requestAnimationFrame(draw);
 }
+
 
 function audioLatido() {
     const latido = new Audio('latido.mp3');
