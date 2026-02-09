@@ -1,5 +1,5 @@
 var teximg = [];
-var texSrc = ["gato.jpg", "cachorro.png", "chao.jpg", "parede.jpg", "lousa.jpg", "cinza.jpg", "madeira.jpg", "coluna.jpg", "janela.jpg", "arcondicionado.jpg", "jan-porta.jpg", "jan-cima.jpg", "projetor.jpg", "preto.jpg", "mesa.jpg"]
+var texSrc = ["gato.jpg", "cachorro.png", "chao.jpg", "parede.jpg", "lousa.jpg", "cinza.jpg", "madeira.jpg", "coluna.jpg", "janela.jpg", "arcondicionado.jpg", "jan-porta.jpg", "jan-cima.jpg", "projetor.jpg", "preto.jpg", "mesa.jpg", "macaneta.jpg", "luz.jpg"]
 var loadTexs = 0;
 var gl;
 var prog;
@@ -8,14 +8,24 @@ var u_modelPtr, u_viewPtr, u_projectionPtr;
 var lightposPtr, camposPtr;
 
 // ====== CÂMERA (VISÃO DE CACHORRO) ======
-var camPos = [0, -1.3, 3];   // >>> ALTERAÇÃO <<<
-var yaw = -90;             // >>> ALTERAÇÃO <<<
-var pitch = 0;             // >>> ALTERAÇÃO <<<
+var camPos = [-4.3, -1.5, 4.5];   
+var yaw = -45;             
+var pitch = 0;             
 
 var speed = 0.08;
 var turnSpeed = 2;
 
+var limitesSala = {
+    minX: -largura + 0.3,
+    maxX:  largura - 0.3,
+    minZ: -profundidade + 0.3,
+    maxZ:  profundidade - 0.3,
+    alturaCam: 0.6
+};
+
 var keys = {};
+
+var tempo = 0;
 
 var Latido = null;
 
@@ -176,46 +186,93 @@ function configScene()
 }
 
 function sendMathJSMatrix(gl, location, matrix) {
-    var transposed = math.transpose(matrix);
-    var flatArray = transposed.toArray().flat(); 
-    gl.uniformMatrix4fv(location, false, new Float32Array(flatArray));
+
+    const flat = math.transpose(matrix).toArray().flat();
+
+    gl.uniformMatrix4fv(
+        location,
+        false,
+        new Float32Array(flat)
+    );
 }
 
-function draw()
-{
+
+var tempo = 0;
+var lastTime = 0;
+
+function draw(time){
+
+    // ===== DELTA TIME (animação suave) =====
+    if(!time) time = 0;
+
+    let delta = (time - lastTime) * 0.001;
+    lastTime = time;
+
+    tempo += delta * 2; // velocidade da animação
+
+
+    // ===== LIMPA TELA =====
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        // ===== MOVIMENTO =====
+
+    // ===== MOVIMENTO DA CÂMERA =====
     var rad = yaw * Math.PI / 180;
 
     if (keys["w"]) {
-        camPos[0] += Math.cos(rad) * speed;
-        camPos[2] += Math.sin(rad) * speed;
-    }
-    if (keys["s"]) {
-        camPos[0] -= Math.cos(rad) * speed;
-        camPos[2] -= Math.sin(rad) * speed;
-    }
-    if (keys["a"]) {
-        camPos[0] += Math.sin(rad) * speed;
-        camPos[2] -= Math.cos(rad) * speed;
-    }
-    if (keys["d"]) {
-        camPos[0] -= Math.sin(rad) * speed;
-        camPos[2] += Math.cos(rad) * speed;
+        let novoX = camPos[0] + Math.cos(rad) * speed;
+        let novoZ = camPos[2] + Math.sin(rad) * speed;
+
+        if (novoX > limitesSala.minX && novoX < limitesSala.maxX)
+            camPos[0] = novoX;
+
+        if (novoZ > limitesSala.minZ && novoZ < limitesSala.maxZ)
+            camPos[2] = novoZ;
     }
 
-    // ===== ROTACAO =====
+    if (keys["s"]) {
+        let novoX = camPos[0] - Math.cos(rad) * speed;
+        let novoZ = camPos[2] - Math.sin(rad) * speed;
+
+        if (novoX > limitesSala.minX && novoX < limitesSala.maxX)
+            camPos[0] = novoX;
+
+        if (novoZ > limitesSala.minZ && novoZ < limitesSala.maxZ)
+            camPos[2] = novoZ;
+    }
+
+    if (keys["a"]) {
+        let novoX = camPos[0] + Math.sin(rad) * speed;
+        let novoZ = camPos[2] - Math.cos(rad) * speed;
+
+        if (novoX > limitesSala.minX && novoX < limitesSala.maxX)
+            camPos[0] = novoX;
+
+        if (novoZ > limitesSala.minZ && novoZ < limitesSala.maxZ)
+            camPos[2] = novoZ;
+    }
+
+    if (keys["d"]) {
+        let novoX = camPos[0] - Math.sin(rad) * speed;
+        let novoZ = camPos[2] + Math.cos(rad) * speed;
+
+        if (novoX > limitesSala.minX && novoX < limitesSala.maxX)
+            camPos[0] = novoX;
+
+        if (novoZ > limitesSala.minZ && novoZ < limitesSala.maxZ)
+            camPos[2] = novoZ;
+    }
+
+
+    // ===== ROTAÇÃO =====
     if (keys["arrowleft"])  yaw -= turnSpeed;
     if (keys["arrowright"]) yaw += turnSpeed;
     if (keys["arrowup"])    pitch += turnSpeed;
     if (keys["arrowdown"])  pitch -= turnSpeed;
-    
 
-    // limita pra não virar de cabeça pra baixo
     pitch = Math.max(-89, Math.min(89, pitch));
 
-    // ====== DIREÇÃO DA CÂMERA ======
+
+    // ===== DIREÇÃO DA CÂMERA =====
     var radYaw = yaw * Math.PI / 180;
     var radPitch = pitch * Math.PI / 180;
 
@@ -237,6 +294,8 @@ function draw()
     gl.uniform3fv(lightposPtr, lightPos);
     gl.uniform3fv(camposPtr, camPos);
 
+
+    // ===== MATRIZES VIEW E PROJECTION =====
     var viewMatrix = lookAt(camPos, camTarget, camUp);
     sendMathJSMatrix(gl, u_viewPtr, viewMatrix);
 
@@ -244,31 +303,64 @@ function draw()
     var projMatrix = createPerspective(45, aspect, 0.1, 100);
     sendMathJSMatrix(gl, u_projectionPtr, projMatrix);
 
-    sendMathJSMatrix(gl, u_modelPtr, math.identity(4));
 
+    // ===== DESENHO DOS OBJETOS =====
     var texPtr = gl.getUniformLocation(prog, "tex");
 
     for (let i = 0; i < objetos.length; i++){
+
+        // identidade REAL
+        let model = math.identity(4);
+
+
+        if(i === paArIndex){
+
+            let angle = Math.sin(tempo) * 10;
+
+            let px = 4.4;
+            let py = 1.35;
+            let pz = 0;
+
+            let T1 = mattrans(-px, -py, -pz); // leva pivô pra origem
+            let R  = matrotZ(angle);
+            let T2 = mattrans(px, py, pz);    // volta
+
+            model = math.multiply(T2,
+                    math.multiply(R, T1));
+        }
+
+
+
+        sendMathJSMatrix(gl, u_modelPtr, model);
+
+
         for (let j = 0; j < objetos[i].indexes_triang.length; j++){
+
             let tex_code = texSrc.indexOf(objetos[i].list_tex[j]);
             if(tex_code < 0) tex_code = 0;
+
             gl.uniform1i(texPtr, tex_code);
-            gl.drawArrays(gl.TRIANGLES, objetos[i].indexes_triang[j], 3);
+
+            gl.drawArrays(
+                gl.TRIANGLES,
+                objetos[i].indexes_triang[j],
+                3
+            );
         }
     }
 
     requestAnimationFrame(draw);
 }
 
-function audioLatido(){
-    latido = new Audio('latido.mp3');
+
+function audioLatido() {
+    const latido = new Audio('latido.mp3');
     latido.preload = "auto";
 
-    const btn = document.getElementById('btnLatido');
-    if(!btn) return;
-
-    btn.addEventListener('click', () => {
-        latido.currentTime = 0;
-        latido.play().catch(function () {});
+    document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'l') {
+            latido.currentTime = 0;
+            latido.play().catch(() => {});
+        }
     });
 }
