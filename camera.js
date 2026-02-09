@@ -49,29 +49,3 @@ function createPerspective(fovy, aspect, near, far)
 							
 	return proj;
 }
-
-function createCamera(pos, target, up){
-    var zc = math.subtract(pos, target);
-    zc = math.divide(zc, math.norm(zc));
-
-    var yt = math.subtract(up, pos);
-    yt = math.divide(yt, math.norm(yt));
-
-    var xc = math.cross(yt, zc);
-    xc = math.divide(yc, math.norm(yc));
-
-    var mt = math.inv(math.transpose(math.matrix([xc, yc, zc])));
-
-    mt = math.resize(mt, [4,4], 0);
-    mt._data[3][3] = 1;
-
-    var mov = math.matrix([[ 1, 0, 0, -pos[0]],
-        [0, 1, 0, -pos[1]],
-        [0, 0, 1, -pos[2]],
-        [0, 0, 0, 1]
-    ]);
-
-    var cam = math.multiply(mt, mov);
-
-    return cam;
-}
