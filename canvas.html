@@ -1,76 +1,97 @@
 <html>
-
     <head>
-        <title>Passeio do Ceará 3D</title>
+        <meta charset="UTF-8">
+        <title>UECE 3D</title>
+
+        <!--importando todos os outros arquivos-->
+        <script src="./math.js"></script>
+        <script src="./transforms.js"></script>
+        <script src="./objetos.js"></script>
+        <script src="./camera.js"></script>
+    
+
+        <!--executando o programa principal e shaders-->
+        <script src="./webgl.js"></script>
+        <script id="vertex-shader" type="notjs">
+            attribute vec4 position;
+            attribute vec2 texCoord;
+            attribute vec3 normal;
+
+            varying vec3 v_normal;
+            varying vec2 v_texCoord;
+            varying vec3 v_pointToLight;
+            varying vec3 v_pointToCam;  
+
+            
+            uniform vec3 lightpos;
+            uniform vec3 campos;
+
+            uniform mat4 u_model;
+            uniform mat4 u_view;
+            uniform mat4 u_projection;
+
+            void main()
+            {
+                vec4 worldPosition = u_model * position;
+
+                v_pointToLight = lightpos - worldPosition.xyz;
+                v_pointToCam = campos - worldPosition.xyz;
+
+                v_normal = (u_model * vec4(normal, 0.0)).xyz;
+                v_texCoord = texCoord;
+
+                gl_Position = u_projection * u_view * worldPosition;
+            }
+        </script>
+        <script id="frag-shader" type="notjs">
+            precision mediump float;
+
+            varying vec3 v_normal;
+            varying vec2 v_texCoord;
+            varying vec3 v_pointToLight;
+            varying vec3 v_pointToCam;
+
+            uniform sampler2D tex;
+
+            void main()
+            {
+                vec3 lightColor = vec3(1.0, 1.0, 1.0);
+                float ambientStrength = 0.3;
+                float diffuseStrength = 1.0;
+                float specularStrength = 0.8;
+                float shininess = 32.0;
+
+               vec3 norm = normalize(v_normal);
+                vec3 lightDir = normalize(v_pointToLight);
+                vec3 viewDir = normalize(v_pointToCam);
+
+               
+                vec3 ambient = ambientStrength * lightColor;
+
+                float diff = max(dot(norm, lightDir), 0.0);
+                vec3 diffuse = diff * lightColor * diffuseStrength;
+
+                vec3 reflectDir = reflect(-lightDir, norm);
+                float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+                vec3 specular = specularStrength * spec * lightColor;
+
+                vec4 texColor = texture2D(tex, v_texCoord);
+
+                // Debug: Se a textura falhar pinta de cinza
+                if(texColor.a < 0.1) {
+                    texColor = vec4(0.7, 0.7, 0.7, 1.0);
+                }
+
+                vec3 result = (ambient + diffuse + specular) * texColor.rgb;
+
+                gl_FragColor = vec4(result, texColor.a);
+            }
+</script>
     </head>
 
-    <script src="./app.js"></script>
-
-    <script id="vertex-shader" type="notjs">
-        attribute vec4 position;
-        attribute vec4 color;
-
-        varying vec4 v_color;
-
-        attribute vec3 normal;
-        varying vec3 v_normal;
-
-        uniform vec3 lightpos;
-        varying vec3 pointToLight;
-
-        uniform vec3 campos;
-        varying vec3 pointToCam;
-
-        void main()
-        {
-            pointToLight = lightpos - position.xyz;
-            pointToCam = campos - position.xyz;
-            
-            v_color = color;
-            gl_Position = position;
-        }
-    </script>
-
-    <script id="frag-shader" type="notjs">
-        precision mediump float;
-
-        varying vec4 v_color;
-
-        varying vec3 v_normal;
-        uniform vec3 lightDirection;
-        uniform vec3 lightColor;
-
-        varying vec3 pointToLight;
-        varying vec3 pointToCam;
-
-        void main()
-        {
-            vec3 pToLight = normalize(pointToLight);
-            vec3 pToCam = normalize(pointToCam);
-
-            vec3 halfVec = normalize(pToCam + pToLight);
-
-            vec3 v_normal_n = normalize(v_normal);
-            vec3 lightDirection_n = normalize(-lightDirection);
-
-            float lightd = dot(v_normal_n, lightDirection_n);
-            float lightp = dot(v_normal_n, pToLight);
-            float lighte = dot(v_normal_n, halfVec);
-
-            if(lightd < 0.0) lightd = 0.0;
-            if(lightp < 0.0) lightp = 0.0;
-            if(lighte < 0.0) lighte = 0.0;
-
-            
-
-            gl_FragColor = v_color;
-        }
-    </script>
-
     <body onload="init()">
-
-        <canvas id="glcanvas1" width="800" height="600"></canvas>
-
+        <div style="margin: 0 auto; width: 95%;">
+            <canvas id="glcanvas1" width="1400" height="700"></canvas>
+        </div>
     </body>
-
 </html>
