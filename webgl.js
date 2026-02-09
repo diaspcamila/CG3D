@@ -1,5 +1,5 @@
 var teximg = [];
-var texSrc = ["gato.jpg", "cachorro.png", "chao.jpg", "parede.jpg", "lousa.jpg", "cinza.jpg", "madeira.jpg", "coluna.jpg", "janela.jpg", "arcondicionado.jpg", "jan-porta.jpg", "jan-cima.jpg", "projetor.jpg", "preto.jpg", "mesa.jpg"]
+var texSrc = ["gato.jpg", "cachorro.png", "chao.jpg", "parede.jpg", "lousa.jpg", "cinza.jpg", "madeira.jpg", "coluna.jpg", "janela.jpg", "arcondicionado.jpg", "jan-porta.jpg", "jan-cima.jpg", "projetor.jpg", "preto.jpg", "mesa.jpg", "macaneta.jpg", "luz.jpg"]
 var loadTexs = 0;
 var gl;
 var prog;
@@ -8,12 +8,20 @@ var u_modelPtr, u_viewPtr, u_projectionPtr;
 var lightposPtr, camposPtr;
 
 // ====== CÂMERA (VISÃO DE CACHORRO) ======
-var camPos = [0, -1.3, 3];   // >>> ALTERAÇÃO <<<
-var yaw = -90;             // >>> ALTERAÇÃO <<<
-var pitch = 0;             // >>> ALTERAÇÃO <<<
+var camPos = [-4.3, -1.5, 4.5];   
+var yaw = -45;             
+var pitch = 0;             
 
 var speed = 0.08;
 var turnSpeed = 2;
+
+var limitesSala = {
+    minX: -largura + 0.3,
+    maxX:  largura - 0.3,
+    minZ: -profundidade + 0.3,
+    maxZ:  profundidade - 0.3,
+    alturaCam: 0.6
+};
 
 var keys = {};
 
@@ -189,20 +197,47 @@ function draw()
     var rad = yaw * Math.PI / 180;
 
     if (keys["w"]) {
-        camPos[0] += Math.cos(rad) * speed;
-        camPos[2] += Math.sin(rad) * speed;
+        let novoX = camPos[0] + Math.cos(rad) * speed;
+        let novoZ = camPos[2] + Math.sin(rad) * speed;
+
+        if (novoX > limitesSala.minX && novoX < limitesSala.maxX)
+            camPos[0] = novoX;
+
+        if (novoZ > limitesSala.minZ && novoZ < limitesSala.maxZ)
+            camPos[2] = novoZ;
     }
+
     if (keys["s"]) {
-        camPos[0] -= Math.cos(rad) * speed;
-        camPos[2] -= Math.sin(rad) * speed;
+        let novoX = camPos[0] - Math.cos(rad) * speed;
+        let novoZ = camPos[2] - Math.sin(rad) * speed;
+
+        if (novoX > limitesSala.minX && novoX < limitesSala.maxX)
+            camPos[0] = novoX;
+
+        if (novoZ > limitesSala.minZ && novoZ < limitesSala.maxZ)
+            camPos[2] = novoZ;
     }
+
     if (keys["a"]) {
-        camPos[0] += Math.sin(rad) * speed;
-        camPos[2] -= Math.cos(rad) * speed;
+        let novoX = camPos[0] + Math.sin(rad) * speed;
+        let novoZ = camPos[2] - Math.cos(rad) * speed;
+
+        if (novoX > limitesSala.minX && novoX < limitesSala.maxX)
+            camPos[0] = novoX;
+
+        if (novoZ > limitesSala.minZ && novoZ < limitesSala.maxZ)
+            camPos[2] = novoZ;
     }
+
     if (keys["d"]) {
-        camPos[0] -= Math.sin(rad) * speed;
-        camPos[2] += Math.cos(rad) * speed;
+        let novoX = camPos[0] - Math.sin(rad) * speed;
+        let novoZ = camPos[2] + Math.cos(rad) * speed;
+
+        if (novoX > limitesSala.minX && novoX < limitesSala.maxX)
+            camPos[0] = novoX;
+
+        if (novoZ > limitesSala.minZ && novoZ < limitesSala.maxZ)
+            camPos[2] = novoZ;
     }
 
     // ===== ROTACAO =====
@@ -260,15 +295,14 @@ function draw()
     requestAnimationFrame(draw);
 }
 
-function audioLatido(){
-    latido = new Audio('latido.mp3');
+function audioLatido() {
+    const latido = new Audio('latido.mp3');
     latido.preload = "auto";
 
-    const btn = document.getElementById('btnLatido');
-    if(!btn) return;
-
-    btn.addEventListener('click', () => {
-        latido.currentTime = 0;
-        latido.play().catch(function () {});
+    document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'l') {
+            latido.currentTime = 0;
+            latido.play().catch(() => {});
+        }
     });
 }

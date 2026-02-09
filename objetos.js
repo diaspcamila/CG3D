@@ -152,10 +152,6 @@ function carteiraAluno(cx, cz){
 }
 
 
-// =======================
-// ====== SALA ===========
-// =======================
-
 var objetos = [];
 
 // dimensões
@@ -164,261 +160,142 @@ const altura = 2.5;
 const profundidade = 6;
 const espessura = 0.05;
 
-// texturas (12 triângulos)
-const texChao   = Array(12).fill("chao.jpg");
-const texParede = Array(12).fill("parede.jpg");
-
 // CHÃO
 objetos.push(
     paralelepipedo(
-        0, -altura, 0,
-        largura, profundidade, espessura,
-        texChao
+        0, -altura, 0, largura, profundidade, espessura, Array(12).fill("chao.jpg")
     )
 );
 
 // TETO
 objetos.push(
     paralelepipedo(
-        0, altura, 0,
-        largura, profundidade, espessura,
-        texParede
+        0, altura, 0, largura, profundidade, espessura, Array(12).fill("parede.jpg")
     )
 );
 
 // PAREDE FUNDO
 objetos.push(
     paralelepipedo(
-        0, 0, -profundidade,
-        largura, espessura, altura,
-        texParede
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        0, 0.1, -5.9,   // levemente mais à frente
-        3.7,           // um pouco mais larga
-        0.08,           // mais espessa
-        0.9,           // mais alta
-        Array(12).fill("cinza.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        0,     // x (centro da parede)
-        0.1,   // y (altura da lousa)
-        -5.8, // z (parede da frente)
-        3.6,   // largura
-        0.03,  // profundidade (bem fininha)
-        0.8,   // altura
-        [
-            "lousa.jpg","lousa.jpg","lousa.jpg",
-            "lousa.jpg","lousa.jpg","lousa.jpg",
-            "lousa.jpg","lousa.jpg","lousa.jpg",
-            "lousa.jpg","lousa.jpg","lousa.jpg"
-        ]
-    )
-);
-
-objetos.push(
-    tampoTrapezioMesa(
-        0,        // x
-        -1.19,       // y
-        -3.5,     // z (perto do quadro)
-        2.1,      // largura da frente
-        3,      // largura de trás
-        0.7,      // profundidade
-        0.04,     // espessura
-        "mesa.jpg"
-    )
-);
-
-
-// ===== PÉ FRENTE ESQUERDA =====
-objetos.push(
-    paralelepipedo(
-        -0.85,   // x
-        -2.0,    // y
-        -3,    // z (frente)
-        0.08,    // largura (mais fino)
-        0.08,    // profundidade
-        0.84,     // altura
-        Array(12).fill("cinza.jpg")
-    )
-);
-
-// ===== PÉ FRENTE DIREITA =====
-objetos.push(
-    paralelepipedo(
-        0.85,
-        -2.0,
-        -3,
-        0.08,
-        0.08,
-        0.84,
-        Array(12).fill("cinza.jpg")
-    )
-);
-
-// ===== PÉ TRÁS ESQUERDA =====
-objetos.push(
-    paralelepipedo(
-        -1.3,
-        -2.0,
-        -4,    // z (trás)
-        0.08,
-        0.08,
-        0.84,
-        Array(12).fill("cinza.jpg")
-    )
-);
-
-// ===== PÉ TRÁS DIREITA =====
-objetos.push(
-    paralelepipedo(
-        1.3,
-        -2.0,
-        -4,
-        0.08,
-        0.08,
-        0.84,
-        Array(12).fill("cinza.jpg")
-    )
-);
-
-
-objetos.push(
-    paralelepipedo(
-        0,
-        -1.5,
-        -3.02,    // mais pra frente
-        0.855,
-        0.05,
-        0.3,
-        Array(12).fill("cinza.jpg")
+        0, 0, -profundidade, largura, espessura, altura, Array(12).fill("parede.jpg")
     )
 );
 
 // PAREDE FRENTE
 objetos.push(
     paralelepipedo(
-        0, 0, profundidade,
-        largura, espessura, altura,
-        texParede
+        0, 0, profundidade, largura, espessura, altura, Array(12).fill("parede.jpg")
     )
 );
 
 // PAREDE ESQUERDA
 objetos.push(
     paralelepipedo(
-        -largura, 0, 0,
-        espessura, profundidade, altura,
-        texParede
+        -largura, 0, 0, espessura, profundidade, altura, Array(12).fill("parede.jpg")
+    )
+);
+
+// PAREDE DIREITA
+objetos.push(
+    paralelepipedo(
+        largura, 0, 0, espessura, profundidade, altura, Array(12).fill("parede.jpg")
+    )
+);
+
+//moldura lousa
+objetos.push(
+    paralelepipedo(
+        0, 0.1, -5.9, 3.7, 0.08, 0.9, Array(12).fill("cinza.jpg")
+    )
+);
+
+//lousa
+objetos.push(
+    paralelepipedo(
+        0, 0.1, -5.8, 3.6, 0.03, 0.8, Array(12).fill("lousa.jpg")
+    )
+);
+
+//mesa professor
+objetos.push(
+    tampoTrapezioMesa(
+        0, -1.19, -3.5, 2.1, 3, 0.7, 0.04, "mesa.jpg"
     )
 );
 
 objetos.push(
     paralelepipedo(
-        -4.9,    // x → parede esquerda
-        -1,    // y → metade da altura da porta
-        4.5,     // z → posição ao longo da parede
-        0.05,     // espessura (parede)
-        0.6,      // largura da porta
-        2,      // altura da porta
-        Array(12).fill("madeira.jpg")
+        -0.85, -2.0, -3, 0.08, 0.08, 0.84, Array(12).fill("cinza.jpg")
     )
 );
 
 objetos.push(
     paralelepipedo(
-        -4.9,    // x → parede esquerda
-        -1,    // y → metade da altura da porta
-        3.29,     // z → posição ao longo da parede
-        0.05,     // espessura (parede)
-        0.6,      // largura da porta
-        2,      // altura da porta
-        Array(12).fill("cinza.jpg")
+        0.85, -2.0, -3, 0.08, 0.08, 0.84, Array(12).fill("cinza.jpg")
     )
 );
 
-// =======================
-// CADEIRA DO PROFESSOR
-// =======================
+objetos.push(
+    paralelepipedo(
+        -1.3, -2.0, -4, 0.08, 0.08, 0.84, Array(12).fill("cinza.jpg")
+    )
+);
+
+objetos.push(
+    paralelepipedo(
+        1.3, -2.0, -4, 0.08, 0.08, 0.84, Array(12).fill("cinza.jpg")
+    )
+);
+
+objetos.push(
+    paralelepipedo(
+        0, -1.5, -3.02, 0.855, 0.05, 0.3, Array(12).fill("cinza.jpg")
+    )
+);
+//fim mesa professor 
+
+// cadeira professor
 let cxp = 0;
 let czp = -4.3;
 
-// assento
 objetos.push(
     paralelepipedo(cxp, -1.75, czp, 0.4, 0.4, 0.05, Array(12).fill("preto.jpg"))
 );
 
-// encosto
 objetos.push(
     paralelepipedo(cxp, -1.3, czp - 0.35, 0.4, 0.05, 0.35, Array(12).fill("preto.jpg"))
 );
 
-// pernas
 objetos.push(paralelepipedo(cxp - 0.3, -2.2, czp + 0.3, 0.04, 0.04, 0.45, Array(12).fill("cinza.jpg")));
 objetos.push(paralelepipedo(cxp + 0.3, -2.2, czp + 0.3, 0.04, 0.04, 0.45, Array(12).fill("cinza.jpg")));
 objetos.push(paralelepipedo(cxp - 0.3, -2.2, czp - 0.3, 0.04, 0.04, 0.45, Array(12).fill("cinza.jpg")));
 objetos.push(paralelepipedo(cxp + 0.3, -2.2, czp - 0.3, 0.04, 0.04, 0.45, Array(12).fill("cinza.jpg")));
+//fim cadeira professor
 
-
-// =======================
-// COMPUTADOR (MESA)
-// =======================
-
-// base
+//computador
 objetos.push(
     paralelepipedo(
-        0.2,        // x
-        -1.13,       // y (em cima da mesa)
-        -3.65,       // z
-        0.35,
-        0.2,
-        0.02,
-        Array(12).fill("cinza.jpg")
-    )
-);
-
-// monitor
-objetos.push(
-    paralelepipedo(
-        0.2,
-        -0.9,
-        -3.45,
-        0.35,
-        0.02,
-        0.25,
-        Array(12).fill("cinza.jpg")
+        0.2, -1.13, -3.65, 0.35, 0.2, 0.02, Array(12).fill("cinza.jpg")
     )
 );
 
 objetos.push(
     paralelepipedo(
-        0.2,
-        -0.9,
-        -3.47,
-        0.3,
-        0.01,
-        0.2,
-        Array(12).fill("cachorro.png")
+        0.2, -0.9, -3.45, 0.35, 0.02, 0.25, Array(12).fill("cinza.jpg")
     )
 );
 
-// =======================
-// PROJETOR
-// =======================
 objetos.push(
     paralelepipedo(
-        -0.5,
-        -1.05,
-        -3.25,
-        0.25,
-        0.18,
-        0.08,
+        0.2, -0.9, -3.47, 0.3, 0.01, 0.2, Array(12).fill("cachorro.png")
+    )
+);
+//fim computador
+
+//projetor
+objetos.push(
+    paralelepipedo(
+        -0.5, -1.05, -3.25, 0.25, 0.18, 0.08,
         [
             "parede.jpg","parede.jpg", 
             "parede.jpg","parede.jpg", 
@@ -430,436 +307,109 @@ objetos.push(
     )
 );
 
-
+//porta
 objetos.push(
     paralelepipedo(
-        -4.8,    // x → parede esquerda
-        0.2,    // y → metade da altura da porta
-        3.29,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.35,      // largura da porta
-        0.45,      // altura da porta
-        Array(12).fill("cinza.jpg")
+        -4.9, -1, 4.5, 0.05, 0.6, 2, Array(12).fill("madeira.jpg")
     )
 );
 
 objetos.push(
     paralelepipedo(
-        -4.79,    // x → parede esquerda
-        0.2,    // y → metade da altura da porta
-        3.29,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.3,      // largura da porta
-        0.4,      // altura da porta
-        Array(12).fill("jan-porta.jpg")
+        -4.9, -1, 3.29, 0.05, 0.6, 2, Array(12).fill("mesa.jpg")
     )
 );
 
 objetos.push(
     paralelepipedo(
-        -4.65,    // x → parede esquerda
-        1.2,    // y → metade da altura da porta
-        0,     // z → posição ao longo da parede
-        0.03,     // espessura (parede)
-        6,      // largura da porta
-        0.03,      // altura da porta
-        Array(12).fill("cinza.jpg")
+        -4.8, 0.2, 3.29, 0.01, 0.35, 0.45, Array(12).fill("mesa.jpg")
     )
 );
 
 objetos.push(
     paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        -5.1,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
+        -4.79, 0.2, 3.29, 0.01, 0.3, 0.4, Array(12).fill("jan-porta.jpg")
     )
 );
 
 objetos.push(
     paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        -4.2,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
+        -4.8, -0.8, 3.7, 0.01, 0.09, 0.2, Array(12).fill("macaneta.jpg")
     )
 );
+//fim porta
+
+
+//cabos
+objetos.push(
+    paralelepipedo(
+        -4.65, 1.2, 0, 0.03, 6, 0.03, Array(12).fill("cinza.jpg")
+    )
+);
+objetos.push(
+    paralelepipedo(
+        4.45, 1.8, 0, 0.03, 6, 0.03, Array(12).fill("cinza.jpg")
+    )
+);
+
+//janelas cima
+const zs = [-5.1, -4.2, -3.3, -2.4, -1.5, -0.6, 0.6, 1.5, 2.4, 3.3, 4.2, 5.1];
+
+zs.forEach(z => {
+    objetos.push(
+        paralelepipedo(
+            -4.9, 1.67, z, 0.01, 0.4, 0.27, Array(12).fill("jan-cima.jpg")
+        )
+    );
+});
 
 objetos.push(
     paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        -3.3,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
+        -4.91, 1.8, 0, 0.01, 6, 0.4, Array(12).fill("cinza.jpg")
     )
 );
+//fim janelas cima
 
+//colunas
+objetos.push(paralelepipedo(-4.75, 0, 5.8, 0.2, 0.2, 3, Array(12).fill("parede.jpg")));
+objetos.push(paralelepipedo(-4.9, 2.25, 0, 0.02, 6, 0.3, Array(12).fill("coluna.jpg")));
+objetos.push(paralelepipedo(-4.75, 0, -5.8, 0.2, 0.2, 3, Array(12).fill("parede.jpg")));
+
+objetos.push(paralelepipedo(0, 2.2, -5.8, 5, 0.21, 0.25, Array(12).fill("coluna.jpg")));
+objetos.push(paralelepipedo(0, 2.2, 5.9, 5, 0.1, 0.25, Array(12).fill("coluna.jpg")));
+objetos.push(paralelepipedo(0, 2.2, 0, 5, 0.21, 0.25, Array(12).fill("coluna.jpg")));
+
+objetos.push(paralelepipedo(4.85, 0, 5.9, 0.1, 1, 3, Array(12).fill("parede.jpg")));
+objetos.push(paralelepipedo(4.85, 0, -5.8, 0.1, 1, 3, Array(12).fill("parede.jpg")));
+objetos.push(paralelepipedo(4.85, 0, 0, 0.1, 0.2, 3, Array(12).fill("parede.jpg")));
+objetos.push(paralelepipedo(4.85, -1.6, 0, 0.11, 6, 0.9, Array(12).fill("parede.jpg")));
+objetos.push(paralelepipedo(4.85, 0, 2.6, 0.1, 0.8, 3, Array(12).fill("parede.jpg")));
+objetos.push(paralelepipedo(4.85, 0, -2.6, 0.1, 0.8, 3, Array(12).fill("parede.jpg")));
+//fim colunas
+
+//ar condicionado
 objetos.push(
     paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        -2.4,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
+        4.75, 1.5, -2.6, 0.3, 0.75, 0.25, Array(12).fill("arcondicionado.jpg")
     )
 );
 
-objetos.push(
-    paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        -1.5,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
-    )
-);
+//janelas
+[-1, -4, 1, 4.1].forEach(z => {
+    objetos.push(paralelepipedo(4.9, 0.2, z, 0.01, 0.8, 1, Array(12).fill("janela.jpg")));
+});
 
-objetos.push(
-    paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        -0.6,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
-    )
-);
+[
+    [-1, -0.68],
+    [-4.1, -0.68],
+    [1, -0.68],
+    [4.15, -0.68]
+].forEach(([z, y]) => {
+    objetos.push(paralelepipedo(4.7, y, z, 0.1, 0.8, 0.04, Array(12).fill("coluna.jpg")));
+});
+//fim janelas
 
-objetos.push(
-    paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        0.6,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        1.5,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        2.4,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        3.3,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        4.2,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.9,    // x → parede esquerda
-        1.67,    // y → metade da altura da porta
-        5.1,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.4,      // largura da porta
-        0.27,      // altura da porta
-        Array(12).fill("jan-cima.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.91,    // x → parede esquerda
-        1.8,    // y → metade da altura da porta
-        0,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        6,      // largura da porta
-        0.4,      // altura da porta
-        Array(12).fill("cinza.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.8,    // x → parede esquerda
-        -0.8,    // y → metade da altura da porta
-        3.7,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.08,      // largura da porta
-        0.18,      // altura da porta
-        Array(12).fill("parede.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.75,    // x → parede esquerda
-        0,    // y → metade da altura da porta
-        5.8,     // z → posição ao longo da parede
-        0.2,     // espessura (parede)
-        0.2,      // largura da porta
-        3,      // altura da porta
-        Array(12).fill("parede.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.9,    // x → parede esquerda
-        2.25,    // y → metade da altura da porta
-        0,     // z → posição ao longo da parede
-        0.02,     // espessura (parede)
-        6,      // largura da porta
-        0.3,      // altura da porta
-        Array(12).fill("coluna.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        -4.75,    // x → parede esquerda
-        0,    // y → metade da altura da porta
-        -5.8,     // z → posição ao longo da parede
-        0.2,     // espessura (parede)
-        0.2,      // largura da porta
-        3,      // altura da porta
-        Array(12).fill("parede.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        0, 
-        2.2, 
-        -5.8,   // levemente mais à frente
-        5,           // um pouco mais larga
-        0.21,           // mais espessa
-        0.25,           // mais alta
-        Array(12).fill("coluna.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        0, 
-        2.2, 
-        5.9,   // levemente mais à frente
-        5,           // um pouco mais larga
-        0.1,           // mais espessa
-        0.25,           // mais alta
-        Array(12).fill("coluna.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        0, 
-        2.2, 
-        0,   // levemente mais à frente
-        5,           // um pouco mais larga
-        0.21,           // mais espessa
-        0.25,           // mais alta
-        Array(12).fill("coluna.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.85,    // x → parede esquerda
-        0,    // y → metade da altura da porta
-        5.9,     // z → posição ao longo da parede
-        0.1,     // espessura (parede)
-        1,      // largura da porta
-        3,      // altura da porta
-        Array(12).fill("parede.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.85,    // x → parede esquerda
-        0,    // y → metade da altura da porta
-        -5.8,     // z → posição ao longo da parede
-        0.1,     // espessura (parede)
-        1,      // largura da porta
-        3,      // altura da porta
-        Array(12).fill("parede.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.85,    // x → parede esquerda
-        0,    // y → metade da altura da porta
-        0,     // z → posição ao longo da parede
-        0.1,     // espessura (parede)
-        0.2,      // largura da porta
-        3,      // altura da porta
-        Array(12).fill("parede.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.85,    // x → parede esquerda
-        -1.6,    // y → metade da altura da porta
-        0,     // z → posição ao longo da parede
-        0.11,     // espessura (parede)
-        6,      // largura da porta
-        0.9,      // altura da porta
-        Array(12).fill("parede.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.85,    // x → parede esquerda
-        0,    // y → metade da altura da porta
-        2.6,     // z → posição ao longo da parede
-        0.1,     // espessura (parede)
-        0.8,      // largura da porta
-        3,      // altura da porta
-        Array(12).fill("parede.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.85,    // x → parede esquerda
-        0,    // y → metade da altura da porta
-        -2.6,     // z → posição ao longo da parede
-        0.1,     // espessura (parede)
-        0.8,      // largura da porta
-        3,      // altura da porta
-        Array(12).fill("parede.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.45,    // x → parede esquerda
-        1.8,    // y → metade da altura da porta
-        0,     // z → posição ao longo da parede
-        0.03,     // espessura (parede)
-        6,      // largura da porta
-        0.03,      // altura da porta
-        Array(12).fill("cinza.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.75,    // x → parede esquerda
-        1.5,    // y → metade da altura da porta
-        -2.6,     // z → posição ao longo da parede
-        0.3,     // espessura (parede)
-        0.75,      // largura da porta
-        0.25,      // altura da porta
-        Array(12).fill("arcondicionado.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.9,    // x → parede esquerda
-        0.2,    // y → metade da altura da porta
-        -1,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.8,      // largura da porta
-        1,      // altura da porta
-        Array(12).fill("janela.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.9,    // x → parede esquerda
-        0.2,    // y → metade da altura da porta
-        -4,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.8,      // largura da porta
-        1,      // altura da porta
-        Array(12).fill("janela.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.9,    // x → parede esquerda
-        0.2,    // y → metade da altura da porta
-        1,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.8,      // largura da porta
-        1,      // altura da porta
-        Array(12).fill("janela.jpg")
-    )
-);
-
-objetos.push(
-    paralelepipedo(
-        4.9,    // x → parede esquerda
-        0.2,    // y → metade da altura da porta
-        4.1,     // z → posição ao longo da parede
-        0.01,     // espessura (parede)
-        0.8,      // largura da porta
-        1,      // altura da porta
-        Array(12).fill("janela.jpg")
-    )
-);
-
-// PAREDE DIREITA
-objetos.push(
-    paralelepipedo(
-        largura, 0, 0,
-        espessura, profundidade, altura,
-        texParede
-    )
-);
-
+//lampadas
 let colunasX = [-2.5, 0, 2.5];
 let filasZ   = [5, 3, 1, -1];
 
@@ -868,10 +418,24 @@ for(let f = 0; f < filasZ.length; f++){
         carteiraAluno(colunasX[c], filasZ[f]);
     }
 }
+let luzesX = [-2.5, 0.0, 2.5]; 
+let luzesZ = [-3.0, 3.0];   
+let yLuz = 2.2;
 
-// =======================
-// AJUSTES FINAIS (NÃO MEXER)
-// =======================
+for (let z of luzesZ) {      
+    for (let x of luzesX) { 
+        objetos.push(
+            paralelepipedo(
+                x, yLuz, z, 0.6, 0.15, 0.04, Array(12).fill("cinza.jpg")
+            )
+        );
+        objetos.push(
+            paralelepipedo(
+                x, yLuz - 0.05, z, 0.45, 0.1, 0.02, Array(12).fill("luz.jpg")
+            )
+        );
+    }
+}
 
 var coords = [];
 var vert_count = 0;
